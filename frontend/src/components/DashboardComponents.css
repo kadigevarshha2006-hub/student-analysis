@@ -1,0 +1,129 @@
+/* App.css or index.css / general component styles to add */
+/* Continuing from Dashboard.css */
+
+.skill-section {
+  margin: 20px 0;
+}
+
+.acquired-skills-title {
+  color: var(--color-accent);
+}
+
+.missing-skills-title {
+  color: #ef4444; /* red 500 */
+}
+
+.hint {
+  font-size: 0.85rem;
+  margin-top: -5px;
+  margin-bottom: 10px;
+}
+
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skill-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+}
+
+.skill-chip.current {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-accent);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.skill-chip.missing {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 24px 0;
+}
+
+/* Timeline Styles */
+.timeline {
+  margin-top: 24px;
+  padding-left: 12px;
+  border-left: 2px solid var(--color-border);
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 24px;
+  margin-bottom: 32px;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -19px;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 3px solid var(--color-bg-surface);
+  box-shadow: 0 0 10px var(--color-primary-glow);
+}
+
+.timeline-marker.final {
+  background: var(--color-accent);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.timeline-content h4 {
+  margin-bottom: 8px;
+  color: #e2e8f0;
+}
+
+.resource-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.resource-link:hover {
+  text-decoration: underline;
+}
+
+ul {
+  padding-left: 20px;
+  margin-top: 8px;
+}
+
+.project-description {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 4px solid var(--color-secondary);
+  margin: 12px 0;
+}
+
+.project-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.project-steps span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.project-steps span::before {
+  content: '✓';
+  color: var(--color-accent);
+  font-weight: bold;
+}
