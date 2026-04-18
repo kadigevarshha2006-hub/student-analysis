@@ -96,7 +96,7 @@ async def analyze_profile(
 
     try:
         response = client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-2.0-flash',
             contents=contents,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -144,7 +144,7 @@ async def get_deep_dive(request: DeepDiveRequest):
     
     try:
         response = client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-2.0-flash',
             contents=prompt,
             config=types.GenerateContentConfig(response_mime_type="application/json")
         )
