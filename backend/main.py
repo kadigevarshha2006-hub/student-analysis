@@ -104,13 +104,21 @@ async def analyze_profile(
         )
         
         # Parse JSON and validate against our Pydantic model
-        result_json = json.loads(response.text)
+        raw_text = response.text.strip()
+        if raw_text.startswith("```json"):
+            raw_text = raw_text[7:]
+        elif raw_text.startswith("```"):
+            raw_text = raw_text[3:]
+        if raw_text.endswith("```"):
+            raw_text = raw_text[:-3]
+            
+        result_json = json.loads(raw_text.strip())
         analysis = AnalysisResult(**result_json)
         return analysis
 
     except Exception as e:
         print(f"Error during AI Analysis: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"AI Error: {str(e)}")
 
 @app.post("/api/deep-dive", response_model=DeepDiveResult)
 async def get_deep_dive(request: DeepDiveRequest):
