@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import './Dashboard.css';
 import SkillGapVisualizer from './SkillGapVisualizer';
 import RoadmapRecommendations from './RoadmapRecommendations';
@@ -14,6 +14,33 @@ const Dashboard = () => {
   const fileInputRef = useRef(null);
 
   const [progressBoost, setProgressBoost] = useState(0);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sharedData = params.get('share');
+    if (sharedData) {
+      try {
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(sharedData))));
+        setAnalysisResult(decoded);
+      } catch (e) {
+        console.error("Failed to load shared roadmap", e);
+        alert("Invalid or corrupted share link.");
+      }
+    }
+  }, []);
+
+  const handleShare = () => {
+    try {
+      const jsonStr = JSON.stringify(analysisResult);
+      const base64Str = btoa(unescape(encodeURIComponent(jsonStr)));
+      const shareUrl = `${window.location.origin}${window.location.pathname}?share=${base64Str}`;
+      navigator.clipboard.writeText(shareUrl);
+      alert('Share link copied to clipboard!');
+    } catch (e) {
+      console.error(e);
+      alert('Failed to generate share link. Data might be too large.');
+    }
+  };
 
   const handleAnalyze = async (completedItems = []) => {
     if ((!githubUrl && !selectedFile) || !targetRole) return;
@@ -37,7 +64,14 @@ const Dashboard = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Analysis failed check backend logs');
+        let errorMsg = 'Analysis failed check backend logs';
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.detail || errorMsg;
+        } catch (e) {
+          // ignore parsing error
+        }
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
@@ -48,7 +82,7 @@ const Dashboard = () => {
       setAnalysisResult(data);
     } catch (error) {
       console.error(error);
-      alert('Failed to analyze profile. Make sure the backend is running and the API key is set.');
+      alert(`Error: ${error.message}\n\n(If it fails intermittently, you might be hitting Gemini API limits or a timeout)`);
     } finally {
       setAnalyzing(false);
     }
@@ -149,8 +183,12 @@ const Dashboard = () => {
             />
           </div>
           
-          <div className="actions">
-            <button className="btn-outline" onClick={() => setAnalysisResult(null)}>Analyze New Profile</button>
+          <div className="actions" style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+            <button className="btn-outline" onClick={() => {
+              setAnalysisResult(null);
+              window.history.pushState({}, '', window.location.pathname);
+            }}>Analyze New Profile</button>
+            <button className="btn-primary" onClick={handleShare}>🔗 Share Roadmap</button>
           </div>
         </div>
       )}
