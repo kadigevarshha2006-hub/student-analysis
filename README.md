@@ -6,7 +6,7 @@ A full-stack web application designed to help job seekers evaluate their resumes
 
 ## 🌐 Live Demo & Repository
 
-- **Live Application**: [Add your live Render link here, e.g., `https://resume-ai-xxxx.onrender.com`]
+- **Live Application**: [https://resume-ai-qxw1.onrender.com](https://resume-ai-qxw1.onrender.com)
 - **GitHub Repository**: [https://github.com/kadigevarshha2006-hub/student-analysis](https://github.com/kadigevarshha2006-hub/student-analysis)
 
 ---
