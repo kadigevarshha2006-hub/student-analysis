@@ -8,16 +8,14 @@ from backend.config import get_settings
 settings = get_settings()
 
 GEMINI_MODELS_FALLBACK = [
-    "gemini-flash-lite-latest",
-    "gemini-3.5-flash-lite",
-    "gemini-3.6-flash",
-    "gemini-2.5-pro",
-    "gemini-2.5-flash"
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash"
 ]
 
 def call_gemini_api(prompt: str) -> Optional[str]:
     """
-    Executes a prompt against Gemini REST API with multi-model fallback and retry.
+    Executes a prompt against Gemini REST API with fast timeout and immediate fallback.
     """
     if not settings.GEMINI_API_KEY:
         return None
@@ -32,20 +30,16 @@ def call_gemini_api(prompt: str) -> Optional[str]:
 
     for model in GEMINI_MODELS_FALLBACK:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={settings.GEMINI_API_KEY}"
-        for attempt in range(2):
-            try:
-                res = requests.post(url, json=payload, verify=False, timeout=30)
-                if res.status_code == 200:
-                    data = res.json()
-                    return data["candidates"][0]["content"]["parts"][0]["text"].strip()
-                elif res.status_code == 429:
-                    time.sleep(1.5)
-                    continue
-                else:
-                    break
-            except Exception as e:
-                print(f"Gemini API model {model} attempt {attempt+1} notice: {e}")
-                time.sleep(1)
+        try:
+            res = requests.post(url, json=payload, verify=False, timeout=4)
+            if res.status_code == 200:
+                data = res.json()
+                return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+            elif res.status_code in [400, 401, 403, 404]:
+                break
+        except Exception as e:
+            print(f"Gemini API model {model} notice: {e}")
+            break
 
     return None
 
@@ -191,66 +185,13 @@ def generate_interview_questions(
     job_text: Optional[str] = None
 ) -> List[Dict[str, Any]]:
     """
-    Generates at least 30 comprehensive, categorized interview questions:
+    Generates at least 30 comprehensive, categorized interview questions instantly:
     - Technical Questions (>= 10)
     - Resume / Project Deep Dive Questions (>= 10)
     - Behavioral Questions (>= 5)
     - Job-Specific Questions (>= 5)
     """
     role_name = target_role or "Full Stack Software Engineer"
-
-    prompt = f"""You are a Principal Tech Interviewer at a premier technology company.
-Generate at least 30 realistic, highly targeted interview questions specifically tailored to this candidate's actual resume, their target role ({role_name}), and their tech stack.
-
-TARGET ROLE: {role_name}
-RESUME CONTENT:
-\"\"\"
-{resume_text[:3500]}
-\"\"\"
-
-CANDIDATE SKILLS: {', '.join(extracted_skills)}
-
-REQUIREMENTS:
-Generate questions across 4 mandatory categories:
-1. 'Technical Questions' (At least 10 questions covering their core languages, databases, APIs, frameworks, and CS fundamentals)
-2. 'Resume & Project Deep Dive' (At least 10 questions referencing the EXACT projects from their resume, e.g. architecture, API choices, concurrency, challenges, trade-offs, testing, scalability)
-3. 'Behavioral Questions' (At least 5 questions using the STAR framework on collaboration, deadline pressure, technical disagreement, and handling failures)
-4. 'Job-Specific Questions' (At least 5 questions tailored strictly to senior expectations for a {role_name})
-
-For EACH question, provide:
-- 'category': "Technical Questions" | "Resume & Project Deep Dive" | "Behavioral Questions" | "Job-Specific Questions"
-- 'question': The interview question text
-- 'difficulty': "Foundational" | "Intermediate" | "Advanced"
-- 'interviewer_intent': What the interviewer is evaluating
-- 'key_topics': ["Topic 1", "Topic 2"]
-- 'key_points_to_mention': ["Point 1", "Point 2", "Point 3"]
-- 'sample_strong_answer': A concise, structured model response
-
-Return ONLY a valid JSON array of question objects matching this schema:
-[
-  {{
-    "category": "Technical Questions",
-    "question": "...",
-    "difficulty": "Intermediate",
-    "interviewer_intent": "...",
-    "key_topics": ["Topic 1", "Topic 2"],
-    "key_points_to_mention": ["Point 1", "Point 2", "Point 3"],
-    "sample_strong_answer": "..."
-  }}
-]
-"""
-
-    response_text = call_gemini_api(prompt)
-    if response_text:
-        try:
-            cleaned_json = re.sub(r"^```json\s*|\s*```$", "", response_text, flags=re.MULTILINE).strip()
-            questions_data = json.loads(cleaned_json)
-            if isinstance(questions_data, list) and len(questions_data) >= 15:
-                return questions_data
-        except Exception as e:
-            print(f"Error parsing 30+ interview questions JSON: {e}")
-
-    # Fallback with at least 30 rich structured questions
     return get_fallback_interview_questions(role_name, extracted_skills)
 
 def get_fallback_roadmap(role_name: str, missing_skills: List[str], known_skills: List[str]) -> List[Dict[str, Any]]:

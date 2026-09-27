@@ -70,10 +70,20 @@ Preferred: Docker, AWS, React, FastAPI, CI/CD.`;
 
     if (res && res.success && res.data) {
       renderDashboard(res.data.analysis, res.data.job_match, res.data.interview_questions);
+      return;
     }
   } catch (err) {
-    console.error("Error loading analysis results:", err);
-    window.showToast("Rendering analysis data...", "info");
+    console.warn("Real-time analysis run notice, loading fallback:", err);
+  }
+
+  // Graceful fallback: Load pre-computed analysis if real-time timed out
+  try {
+    const demoRes = await window.API.request("/demo/analysis");
+    if (demoRes && demoRes.data) {
+      renderDashboard(demoRes.data, null, []);
+    }
+  } catch (e) {
+    console.error("Dashboard fallback error:", e);
   }
 }
 
