@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analysis & Match Report - ResumeAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/results.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar no-print">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <span>⚡ Resume<span style="color: var(--primary);">AI</span></span>
+        <span class="logo-badge">Pro</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="analyzer.html" class="nav-link">Analyze New</a></li>
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="theme-btn theme-toggle-btn" title="Toggle Theme">☀️</button>
+        <button type="button" onclick="window.print()" class="btn btn-outline" style="padding: 6px 14px; font-size: 0.85rem;">🖨️ Export PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Report Dashboard -->
+  <main class="results-page">
+    <div class="container">
+      <!-- Report Header -->
+      <div class="report-header">
+        <div>
+          <h1 class="section-title">AI Resume Intelligence Report</h1>
+          <p class="section-desc">Multi-Stage ATS Evaluation, Skill Taxonomy & Semantic Job Alignment</p>
+        </div>
+        <div>
+          <span id="results-badge" class="badge badge-primary">✓ Analysis Verified & Stored in MySQL</span>
+        </div>
+      </div>
+
+      <!-- 3-Score Metrics Grid (Resume Health, ATS Compatibility, Job Match, Skills Breadth) -->
+      <div class="scores-grid">
+        <!-- Metric 1: Resume Health Score -->
+        <div class="score-widget">
+          <div id="overall-score-circle" class="score-circle-wrap">
+            <div class="score-circle-core">
+              <span id="overall-score-val" class="score-num">--</span>
+              <span class="score-desc">/ 100</span>
+            </div>
+          </div>
+          <div class="score-name">Resume Health</div>
+          <div class="score-desc">Completeness, structure & quality</div>
+        </div>
+
+        <!-- Metric 2: ATS Score -->
+        <div class="score-widget">
+          <div id="ats-score-circle" class="score-circle-wrap">
+            <div class="score-circle-core">
+              <span id="ats-score-val" class="score-num">--</span>
+              <span class="score-desc">/ 100</span>
+            </div>
+          </div>
+          <div class="score-name">ATS Compatibility</div>
+          <div class="score-desc">Scanner parseability & format</div>
+        </div>
+
+        <!-- Metric 3: Job Match Score -->
+        <div class="score-widget">
+          <div id="match-score-circle" class="score-circle-wrap">
+            <div class="score-circle-core">
+              <span id="match-score-val" class="score-num">--</span>
+              <span class="score-desc">%</span>
+            </div>
+          </div>
+          <div class="score-name">Job Match Percentage</div>
+          <div class="score-desc">Semantic vector alignment</div>
+        </div>
+
+        <!-- Metric 4: Skills Score -->
+        <div class="score-widget">
+          <div id="quality-score-circle" class="score-circle-wrap">
+            <div class="score-circle-core">
+              <span id="quality-score-val" class="score-num">--</span>
+              <span class="score-desc">/ 100</span>
+            </div>
+          </div>
+          <div class="score-name">Skills Breadth</div>
+          <div class="score-desc">Taxonomy density & coverage</div>
+        </div>
+      </div>
+
+      <!-- Tabbed Navigation -->
+      <div class="tab-nav no-print">
+        <button class="tab-btn active" data-tab="tab-overview">📊 Overview & Charts</button>
+        <button class="tab-btn" data-tab="tab-ats">🎯 ATS Checklist</button>
+        <button class="tab-btn" data-tab="tab-job-match">🧠 Job Match & Skill Gaps</button>
+        <button class="tab-btn" data-tab="tab-bullets">✨ AI Bullet Rewrites</button>
+        <button class="tab-btn" data-tab="tab-interview">🎙️ Interview Prep (30+ Qs)</button>
+        <button class="tab-btn" data-tab="tab-skills">🔍 Extracted Skills</button>
+      </div>
+
+      <!-- Tab 1: Overview & Charts -->
+      <div id="tab-overview" class="tab-content active">
+        <!-- Visual Charts Row -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-header">
+              <span>Section Breakdown (Multi-Factor Radar)</span>
+              <span class="badge badge-primary">Radar Analysis</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="radarChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-header">
+              <span>Job Skills Overlap (Matched vs Missing)</span>
+              <span class="badge badge-success">Donut Split</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="donutChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Strengths & Weaknesses Grid -->
+        <div class="grid-3" style="grid-template-columns: 1fr 1fr; margin-bottom: 24px;">
+          <div class="card">
+            <h3 style="color: var(--success); margin-bottom: 14px; font-size: 1.15rem;">✅ Key Resume Strengths</h3>
+            <ul id="strengths-list" style="list-style: none;"></ul>
+          </div>
+
+          <div class="card">
+            <h3 style="color: var(--danger); margin-bottom: 14px; font-size: 1.15rem;">⚠️ Areas for Improvement</h3>
+            <ul id="weaknesses-list" style="list-style: none;"></ul>
+          </div>
+        </div>
+
+        <div class="card" style="text-align: left;">
+          <h3 style="color: var(--warning); margin-bottom: 12px; font-size: 1.15rem;">💡 Recruiter Action Recommendations</h3>
+          <ul id="recommendations-list" style="list-style: none;"></ul>
+        </div>
+      </div>
+
+      <!-- Tab 2: ATS Checklist with Itemized Evidence -->
+      <div id="tab-ats" class="tab-content">
+        <div class="card" style="margin-bottom: 20px;">
+          <h2 style="font-size: 1.25rem; margin-bottom: 6px;">Deterministic ATS Verification</h2>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            Automated compliance checks inspecting headings, contact information completeness, formatting risks, and quantifiable impact with explicit detected evidence.
+          </p>
+        </div>
+        <div id="ats-checks-container"></div>
+      </div>
+
+      <!-- Tab 3: Job Match & Skill Gaps -->
+      <div id="tab-job-match" class="tab-content">
+        <div class="charts-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 24px;">
+          <!-- Matching Skills Card -->
+          <div class="card" style="text-align: left;">
+            <h3 style="color: var(--success); margin-bottom: 12px; font-size: 1.15rem;">✓ Matched Requirements (Present in Resume)</h3>
+            <div id="matching-skills-tags"></div>
+          </div>
+
+          <!-- Missing Skills Card -->
+          <div class="card" style="text-align: left;">
+            <h3 style="color: var(--danger); margin-bottom: 12px; font-size: 1.15rem;">✗ Missing Target Requirements</h3>
+            <div id="missing-skills-tags"></div>
+          </div>
+        </div>
+
+        <!-- Partially Matched (Transferable) Skills Card -->
+        <div class="card" style="margin-bottom: 24px; text-align: left;">
+          <h3 style="color: var(--info); margin-bottom: 12px; font-size: 1.15rem;">🔄 Partially Matched (Transferable Knowledge)</h3>
+          <div id="partial-skills-container"></div>
+        </div>
+
+        <!-- Priority Skill Gap Breakdown -->
+        <div class="card" style="margin-bottom: 24px; text-align: left;">
+          <h3 style="margin-bottom: 14px; font-size: 1.2rem;">🎯 Prioritized Skill Gap Analysis</h3>
+          <div id="priority-gaps-container"></div>
+        </div>
+
+        <!-- Role-Aware Learning Roadmap -->
+        <div class="card" style="text-align: left;">
+          <h3 style="color: var(--primary); margin-bottom: 16px; font-size: 1.2rem;">🚀 Role-Aware Learning Roadmap</h3>
+          <div id="learning-roadmap-container"></div>
+        </div>
+      </div>
+
+      <!-- Tab 4: AI Bullet Rewrites -->
+      <div id="tab-bullets" class="tab-content">
+        <div class="card" style="margin-bottom: 24px; text-align: left;">
+          <h2 style="font-size: 1.25rem; margin-bottom: 6px;">AI Bullet Point Enhancement</h2>
+          <p style="font-size: 0.9rem; color: var(--text-secondary);">
+            Powered by Google Gemini. Replaces passive phrases with high-impact action verbs and highlights quantifiable achievements <strong>without inventing fake numbers, companies, or metrics</strong>.
+          </p>
+        </div>
+        <div id="bullet-improvements-container"></div>
+      </div>
+
+      <!-- Tab 5: AI Interview Prep (30+ Questions with Filter Tabs) -->
+      <div id="tab-interview" class="tab-content">
+        <div class="card" style="margin-bottom: 24px; text-align: left;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+            <div>
+              <h2 style="font-size: 1.25rem; margin-bottom: 4px;">🎙️ Comprehensive Interview Preparation Coach</h2>
+              <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                30+ realistic technical, project deep-dive, behavioral, and job-specific interview questions with STAR method answer strategies.
+              </p>
+            </div>
+            <span class="badge badge-primary">30+ Tailored Questions</span>
+          </div>
+
+          <!-- Category Filter Buttons -->
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;" class="no-print">
+            <button type="button" class="btn btn-primary interview-filter-btn" data-category="ALL" style="padding: 6px 14px; font-size: 0.85rem;">All Questions (30+)</button>
+            <button type="button" class="btn btn-secondary interview-filter-btn" data-category="Technical Questions" style="padding: 6px 14px; font-size: 0.85rem;">💻 Technical Core (10)</button>
+            <button type="button" class="btn btn-secondary interview-filter-btn" data-category="Resume & Project Deep Dive" style="padding: 6px 14px; font-size: 0.85rem;">🛠️ Project Deep Dives (10)</button>
+            <button type="button" class="btn btn-secondary interview-filter-btn" data-category="Behavioral Questions" style="padding: 6px 14px; font-size: 0.85rem;">🤝 Behavioral (STAR) (5)</button>
+            <button type="button" class="btn btn-secondary interview-filter-btn" data-category="Job-Specific Questions" style="padding: 6px 14px; font-size: 0.85rem;">🎯 Job-Specific (5)</button>
+          </div>
+        </div>
+
+        <div id="interview-questions-container"></div>
+      </div>
+
+      <!-- Tab 6: Extracted Skills -->
+      <div id="tab-skills" class="tab-content">
+        <div class="chart-card" style="margin-bottom: 24px;">
+          <div class="chart-header">
+            <span>Skill Category Distribution</span>
+            <span class="badge badge-primary">Taxonomy Bar Graph</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="barChart"></canvas>
+          </div>
+        </div>
+        <div id="categorized-skills-grid" class="grid-3"></div>
+      </div>
+
+      <!-- Bottom Action CTA -->
+      <div class="no-print" style="margin-top: 40px; text-align: center;">
+        <a href="analyzer.html" class="btn btn-primary btn-lg">🚀 Upload Another Resume</a>
+        <a href="dashboard.html" class="btn btn-secondary btn-lg" style="margin-left: 12px;">📊 View History</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/results.js"></script>
+</body>
+</html>

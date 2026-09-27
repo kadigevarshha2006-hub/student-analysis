@@ -1,0 +1,11 @@
+/* ====================================================================
+   ResumeAI - Dashboard & History Styles
+   ==================================================================== */
+
+.dashboard-page {
+  min-height: calc(100vh - 120px);
+}
+
+table tr:hover {
+  background: var(--bg-card-hover);
+}

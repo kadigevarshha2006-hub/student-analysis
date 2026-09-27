@@ -1,13 +1,149 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResumeAI - AI-Powered Resume Analyzer & Job Matching System</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <span>⚡ Resume<span style="color: var(--primary);">AI</span></span>
+        <span class="logo-badge">Pro</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link active">Home</a></li>
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+        <li><a href="analyzer.html" class="nav-link">Analyze Resume</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="theme-btn theme-toggle-btn" title="Toggle Theme">☀️</button>
+        <div id="auth-nav-container" class="nav-actions">
+          <a href="login.html" class="btn btn-secondary">Sign In</a>
+          <a href="register.html" class="btn btn-primary">Get Started</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-pill">✨ Powered by Hybrid AI & Semantic Embeddings</div>
+      <h1 class="hero-title">
+        Turn Your Resume Into Your <br>
+        <span class="gradient-text">Career Advantage</span>
+      </h1>
+      <p class="hero-subtitle">
+        Intelligent ATS compatibility scoring, NLP skill extraction, deep semantic job matching, and AI-powered bullet point refinement tailored for top tech roles.
+      </p>
+      <div class="hero-buttons">
+        <a href="analyzer.html" class="btn btn-primary btn-lg">🚀 Upload & Analyze Resume</a>
+        <a href="dashboard.html" class="btn btn-secondary btn-lg">📊 View Dashboard</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section id="features" class="features-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Engineered for Maximum Precision</h2>
+        <p class="section-desc">A multi-stage AI/NLP pipeline that inspects structure, extracts taxonomy skills, and matches job descriptions without hallucinations.</p>
+      </div>
+
+      <div class="grid-3">
+        <!-- Feature 1 -->
+        <div class="card">
+          <div class="card-icon">🎯</div>
+          <h3 class="card-title">ATS Compatibility Engine</h3>
+          <p class="card-text">Deterministic multi-factor analysis evaluating section headings, contact completeness, formatting risks, and keyword densities.</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="card">
+          <div class="card-icon">🧠</div>
+          <h3 class="card-title">Semantic Job Matcher</h3>
+          <p class="card-text">Uses Sentence Transformers dense embeddings to compute true semantic alignment between candidate experience and job descriptions.</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="card">
+          <div class="card-icon">📊</div>
+          <h3 class="card-title">Skill-Gap Roadmap</h3>
+          <p class="card-text">Identifies matching, missing, and partial skills prioritized into High, Medium, and Low tiers with actionable learning timelines.</p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="card">
+          <div class="card-icon">✨</div>
+          <h3 class="card-title">AI Bullet Refinement</h3>
+          <p class="card-text">Gemini-powered rewriting of weak bullet points using high-impact action verbs and quantified impact without inventing false facts.</p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="card">
+          <div class="card-icon">🔍</div>
+          <h3 class="card-title">spaCy Taxonomy Extractor</h3>
+          <p class="card-text">Extensible hierarchical skill database classifying 500+ skills into Programming, Web, AI/ML, Cloud/DevOps, and Soft Skills.</p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="card">
+          <div class="card-icon">📈</div>
+          <h3 class="card-title">Interactive Analytics</h3>
+          <p class="card-text">Beautiful Chart.js visualizations, animated radial gauges, and multi-version historical comparison tracking.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how-it-works" class="features-section" style="border-top: 1px solid var(--border-color);">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-desc">Four simple steps to benchmark and optimize your resume for recruiters and ATS scanners.</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 2.2rem; color: var(--primary); font-weight: 800; margin-bottom: 12px;">01</div>
+          <h3 class="card-title">Upload Resume</h3>
+          <p class="card-text">Drop your PDF or DOCX file for instant structured parsing and entity extraction.</p>
+        </div>
+
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 2.2rem; color: var(--secondary); font-weight: 800; margin-bottom: 12px;">02</div>
+          <h3 class="card-title">Add Job Description</h3>
+          <p class="card-text">Paste the target role description to evaluate semantic match and keyword relevance.</p>
+        </div>
+
+        <div class="card" style="text-align: center;">
+          <div style="font-size: 2.2rem; color: var(--success); font-weight: 800; margin-bottom: 12px;">03</div>
+          <h3 class="card-title">Get AI Insights</h3>
+          <p class="card-text">Receive an ATS score, skill-gap analysis, interactive charts, and polished bullets.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 ResumeAI - Major Project. Built with HTML5, CSS3, Vanilla JS, FastAPI, spaCy & Google Gemini.</p>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
 </html>

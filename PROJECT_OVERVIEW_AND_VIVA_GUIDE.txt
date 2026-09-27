@@ -1,0 +1,141 @@
+================================================================================
+                    RESUMEAI — PROJECT ARCHITECTURE & VIVA GUIDE
+           Intelligent Multi-Stage Resume Analyzer & Job Matching System
+================================================================================
+
+1. PROJECT SUMMARY & OBJECTIVE
+--------------------------------------------------------------------------------
+ResumeAI is an end-to-end, AI-powered Resume Intelligence & Career Optimization
+system designed for undergraduate students, job seekers, and recruiters.
+
+It solves real-world hiring bottlenecks by performing:
+- Deterministic ATS (Applicant Tracking System) Compatibility Scoring (0-100)
+- Deep Skill Taxonomy Extraction & Canonical Normalization (e.g. JS -> JavaScript)
+- 3-Tier Semantic Job Matching (Matched, Transferable/Partial, Missing)
+- Role-Aware Multi-Week Learning Roadmaps (tailored to specific domains)
+- AI-Powered Bullet Point Rewrites using high-impact active verbs (no hallucinated metrics)
+- Comprehensive 30+ Categorized Interview Preparation Coach (STAR method)
+
+
+2. PROJECT FOLDER STRUCTURE & IMPORTANT FILES
+--------------------------------------------------------------------------------
+The project is organized into a clean client-server architecture:
+
+📁 student_analysis/ (Project Root)
+├── run.bat                          -> 1-click startup script (installs dependencies & launches server)
+├── requirements.txt                 -> Python library dependencies
+├── resume_ai.db                     -> Local SQLite database (stores user accounts & analysis history)
+├── .env / .env.example              -> API configuration file (Google Gemini API key)
+├── README.md                        -> Project setup & overview documentation
+├── presentation.pdf                 -> Presentation slides for college evaluation
+│
+├── 📁 backend/ (FastAPI Python Backend)
+│   ├── main.py                      -> Application entry point, CORS, and static asset router
+│   ├── config.py                    -> Environment settings & API key manager
+│   ├── database.py                  -> Database engine with auto-fallback (MySQL/SQLite)
+│   │
+│   ├── 📁 ai/                       -> Generative AI Modules
+│   │   └── gemini_client.py         -> Multi-model Gemini client (Roadmaps, 30+ Interview Qs, Rewrites)
+│   │
+│   ├── 📁 nlp/                      -> Natural Language Processing & Parsing Engine
+│   │   ├── parser.py                -> Multi-engine document parser (pdfplumber + Gemini OCR fallback)
+│   │   ├── section_extractor.py     -> Regex & fuzzy heading extractor for Contact/Education/Skills/Projects
+│   │   ├── skill_taxonomy.py        -> 200+ canonical tech skills & bidirectional alias lookup
+│   │   ├── skill_extractor.py       -> Whole-document boundary-safe skill scanner
+│   │   └── semantic_matcher.py      -> SentenceTransformer SBERT cosine similarity & 3-tier matcher
+│   │
+│   ├── 📁 services/                 -> Core Business Logic
+│   │   └── scoring_service.py       -> Computes Resume Health (0-100) & ATS Compatibility (0-100)
+│   │
+│   ├── 📁 routes/                   -> REST API Route Handlers
+│   │   ├── auth.py                  -> User registration, login, JWT token auth
+│   │   ├── resume.py                -> Resume upload and plain text submission
+│   │   ├── analysis.py              -> Main analysis pipeline orchestrator
+│   │   └── job.py                   -> Job description parsing & matching history
+│   │
+│   └── 📁 models/ & schemas/        -> SQLAlchemy database tables & Pydantic validation schemas
+│
+├── 📁 frontend/ (Vanilla Web Client — HTML5, CSS3, JavaScript)
+│   ├── index.html                   -> Modern landing page & feature highlights
+│   ├── analyzer.html                -> Resume upload dropzone & job description input
+│   ├── results.html                 -> Interactive intelligence report (Radar/Donut charts, ATS checklist, Roadmap, 30+ Qs)
+│   ├── dashboard.html               -> User profile & past analysis history table
+│   ├── login.html / register.html   -> User authentication pages
+│   ├── 📁 css/                      -> Modern dark-theme stylesheets & component styles
+│   └── 📁 js/                       -> Client controllers (results.js, upload.js, charts.js, api.js, auth.js)
+│
+└── 📁 uploads/                      -> Storage directory for parsed candidate resumes
+
+
+3. SYSTEM ARCHITECTURE & HOW IT WORKS STEP-BY-STEP
+--------------------------------------------------------------------------------
+When a user uploads a resume and provides a target job description, the system
+processes the data through 5 sequential stages:
+
+STAGE 1: DOCUMENT PARSING & MULTI-MODEL OCR
+- Extracts text using local Python parsers (`pdfplumber`, `pypdf`, `python-docx`).
+- If the resume is an image-based or graphical Canva PDF, it triggers an OCR fallback
+  via Google Gemini (`gemini-flash-lite-latest`, `gemini-3.5-flash-lite`) with retry backoff.
+
+STAGE 2: STRUCTURED SECTION & CONTACT EXTRACTION
+- Uses flexible international regex patterns to extract candidate Name, Email,
+  Phone Number, LinkedIn profile, GitHub repository, and Location.
+- Uses fuzzy heading detection to parse sections: Education, Skills, Projects, Experience.
+
+STAGE 3: CANONICAL SKILL NORMALIZATION
+- Standardizes technology variants into canonical skills (e.g., "JS" -> "JavaScript",
+  "HTML5" -> "HTML", "ReactJS" -> "React", "Py" -> "Python", "MySQL" -> "SQL").
+- Scans across all sections (Skills, Projects, Experience, Education) to capture every skill.
+
+STAGE 4: DETERMINISTIC ATS & HEALTH SCORING
+- Computes three separate, explainable scores with itemized evidence:
+  1. Resume Health (0-100): Evaluates structure, technical depth, and completeness.
+  2. ATS Compatibility (0-100): Evaluates machine parseability, headings, and contact info.
+  3. Job Match % (0-100%): Evaluates skill overlap and semantic vector alignment.
+
+STAGE 5: 3-TIER SKILL MATCHING & SBERT VECTOR SIMILARITY
+- Compares resume skills against job requirements:
+  * ✓ MATCHED: Requirements explicitly found in the resume.
+  * 🔄 PARTIALLY MATCHED: Transferable skills (e.g. MySQL for PostgreSQL; Docker for Kubernetes).
+  * ✗ MISSING: Unmet job requirements.
+- Computes semantic similarity using `SentenceTransformer (all-MiniLM-L6-v2)`.
+
+STAGE 6: AI-POWERED ROLE-AWARE ROADMAP & 30+ INTERVIEW COACH
+- Role-Aware Roadmap: Branches based on the chosen role (Frontend, Data Science, ML, Backend).
+  Recognizes candidate's existing skills and recommends weekly milestones, documentation,
+  and top YouTube video tutorials for missing skills.
+- 30+ Interview Questions: Generates at least 30 categorized questions with answers:
+  * Technical Core Questions (10)
+  * Project Deep Dives (10, based on candidate's actual projects)
+  * Behavioral STAR Questions (5)
+  * Job-Specific Questions (5)
+- Bullet Point Enhancements: Replaces weak verbs with high-impact power verbs with zero hallucinated data.
+
+
+4. KEY TECHNOLOGIES USED
+--------------------------------------------------------------------------------
+- Backend Framework: FastAPI (Python 3.10+)
+- Natural Language Processing: Sentence-Transformers (SBERT), Scikit-Learn, RegEx
+- Generative AI: Google Gemini API (2.5/3.5/Flash-Lite)
+- Database: SQLite (default zero-config) & MySQL (XAMPP support) via SQLAlchemy ORM
+- Security: JWT (JSON Web Tokens), Passlib Bcrypt Password Hashing
+- Frontend: HTML5, CSS3, Vanilla JavaScript, Chart.js
+
+
+5. COMMON VIVA / PRESENTATION QUESTIONS & ANSWERS
+--------------------------------------------------------------------------------
+Q1: What is the main advantage of your system over standard ATS checkers?
+A1: Traditional ATS tools use naive keyword matching that fails on aliases (e.g. missing "JS" when "JavaScript" is asked) and graphic PDFs. ResumeAI combines OCR fallback, canonical taxonomy normalization, transferable skill recognition, and non-hallucinatory AI mentorship in one unified pipeline.
+
+Q2: How do you handle graphic Canva resumes that fail standard text extraction?
+A2: When local text extraction returns insufficient text, the parser triggers an automated Gemini Vision OCR fallback across multiple models with retry backoff to extract the complete text.
+
+Q3: How is the Job Match percentage calculated?
+A3: The match percentage is a weighted formula combining:
+    - 3-Tier Skill Overlap (55%): Exact matches count 100%, transferable skills count 50%.
+    - Semantic Similarity (30%): Cosine similarity between SBERT vector embeddings.
+    - Experience Relevance (15%): Multi-factor context relevance.
+
+Q4: How do you prevent AI hallucinations in bullet point rewrites?
+A4: The Gemini system prompt strictly enforces that no fake numbers, percentages, companies, or technologies are invented. If a metric is missing, the system provides a non-hallucinatory guidance placeholder.
+================================================================================
