@@ -3,7 +3,6 @@ from backend.routes.resume import router as resume_router
 from backend.routes.analysis import router as analysis_router
 from backend.routes.job import router as job_router
 from backend.routes.demo import router as demo_router
-from backend.routes.admin import router as admin_router
 
 __all__ = [
     "auth_router",
@@ -11,6 +10,6 @@ __all__ = [
     "analysis_router",
     "job_router",
     "demo_router",
-    "admin_router",
 ]
+
 

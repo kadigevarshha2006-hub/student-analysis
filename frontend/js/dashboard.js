@@ -19,7 +19,7 @@ async function loadUserDashboard() {
 
   if (!token || !user) {
     if (nameEl) nameEl.textContent = "Guest / Not Logged In";
-    if (emailEl) emailEl.innerHTML = `<a href="login.html" style="color: var(--primary); text-decoration: underline;">Sign In</a> to view your personal uploaded resumes, or <a href="database.html" style="color: var(--primary); text-decoration: underline;">open the Cloud Database Viewer</a>.`;
+    if (emailEl) emailEl.innerHTML = `<a href="login.html" style="color: var(--primary); text-decoration: underline;">Sign In</a> to view your personal uploaded resumes.`;
     if (totalEl) totalEl.textContent = "0";
     if (bestOverallEl) bestOverallEl.textContent = "-- / 100";
     if (bestAtsEl) bestAtsEl.textContent = "-- / 100";
@@ -33,7 +33,7 @@ async function loadUserDashboard() {
             <p style="font-size: 0.9rem; margin-bottom: 16px;">Sign in to your account to view your uploaded resumes and evaluation reports.</p>
             <div style="display: flex; gap: 10px; justify-content: center;">
               <a href="login.html" class="btn btn-primary" style="padding: 6px 16px;">Sign In</a>
-              <a href="database.html" class="btn btn-secondary" style="padding: 6px 16px;">View All Cloud Records</a>
+              <a href="register.html" class="btn btn-secondary" style="padding: 6px 16px;">Create Account</a>
             </div>
           </td>
         </tr>
@@ -120,7 +120,7 @@ async function loadUserDashboard() {
           <td colspan="6" style="text-align: center; padding: 30px; color: var(--danger);">
             Could not load resume history (${escapeHtml(err.message)}).
             <div style="margin-top: 10px;">
-              <a href="database.html" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;">Open Live Cloud Database Viewer</a>
+              <a href="analyzer.html" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;">Upload & Analyze Resume</a>
             </div>
           </td>
         </tr>
