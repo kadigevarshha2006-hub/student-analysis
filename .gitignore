@@ -46,8 +46,9 @@ resume_ai.db
 uploads/*
 !uploads/.gitkeep
 
-# Local testing PDF artifacts
+# Local testing & guide documents
 backend/*.pdf
+PROJECT_MASTER_GUIDE.md
 
 # Node / Frontend artifacts
 node_modules/

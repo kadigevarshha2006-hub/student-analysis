@@ -18,12 +18,6 @@ An enterprise-grade, AI-powered Resume Analyzer, ATS Compatibility Scorer, and S
 
 ---
 
-## 🏛️ System Architecture
-
-![ResumeAI Architecture](frontend/assets/system_architecture.png)
-
----
-
 ## 🗄️ Database Architecture
 
 The system features a normalized schema with indexes, relationships, and cascade behaviors:
