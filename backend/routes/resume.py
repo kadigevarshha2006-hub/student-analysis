@@ -2,7 +2,7 @@ import os
 import shutil
 import time
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -124,6 +124,58 @@ def list_user_resumes(
         data=[ResumeOut.model_validate(r) for r in resumes]
     )
 
+@router.get("/my-history", response_model=APIResponse[Dict[str, Any]])
+def get_user_resume_history(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Returns detailed resume history with analysis scores for current user."""
+    resumes = db.query(Resume).filter(Resume.user_id == current_user.id).order_by(Resume.created_at.desc()).all()
+    
+    items = []
+    best_overall = 0.0
+    best_ats = 0.0
+
+    for r in resumes:
+        ov = None
+        ats = None
+        if r.analysis:
+            ov = round(r.analysis.overall_score, 1)
+            ats = round(r.analysis.ats_score, 1)
+            if ov > best_overall:
+                best_overall = ov
+            if ats > best_ats:
+                best_ats = ats
+        
+        items.append({
+            "id": r.id,
+            "filename": r.filename,
+            "file_type": r.file_type,
+            "file_size_bytes": r.file_size_bytes,
+            "overall_score": ov,
+            "ats_score": ats,
+            "has_analysis": bool(r.analysis),
+            "created_at": r.created_at.strftime("%Y-%m-%d %H:%M:%S") if r.created_at else "N/A"
+        })
+
+    return APIResponse(
+        success=True,
+        message=f"Retrieved {len(items)} resumes for {current_user.email}.",
+        data={
+            "user": {
+                "id": current_user.id,
+                "full_name": current_user.full_name,
+                "email": current_user.email
+            },
+            "stats": {
+                "total_resumes": len(items),
+                "best_overall": best_overall,
+                "best_ats": best_ats
+            },
+            "resumes": items
+        }
+    )
+
 @router.get("/{resume_id}", response_model=APIResponse[ResumeOut])
 def get_resume(
     resume_id: int,
@@ -139,3 +191,4 @@ def get_resume(
         message="Resume retrieved.",
         data=ResumeOut.model_validate(resume)
     )
+

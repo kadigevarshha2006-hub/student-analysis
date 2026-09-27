@@ -11,6 +11,7 @@ from backend.routes import (
     analysis_router,
     job_router,
     demo_router,
+    admin_router,
 )
 
 settings = get_settings()
@@ -43,6 +44,8 @@ app.include_router(resume_router, prefix="/api")
 app.include_router(analysis_router, prefix="/api")
 app.include_router(job_router, prefix="/api")
 app.include_router(demo_router, prefix="/api")
+app.include_router(admin_router, prefix="/api")
+
 
 # System Health Check Endpoint
 @app.get("/health", tags=["System"])

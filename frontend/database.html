@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud Database Viewer - ResumeAI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    .db-header-card {
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(16, 185, 129, 0.08));
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .pulse-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .db-tabs {
+      display: flex;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+    .db-tab-btn {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .db-tab-btn:hover {
+      color: var(--text-primary);
+    }
+    .db-tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .db-table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .db-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+    .db-table th {
+      background: var(--bg-secondary);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .db-table td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+    .db-table tr:last-child td {
+      border-bottom: none;
+    }
+    .db-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .search-input-db {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      width: 100%;
+      max-width: 380px;
+    }
+    .search-input-db:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .raw-code-box {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      color: #38bdf8;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      max-height: 500px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <span>⚡ Resume<span style="color: var(--primary);">AI</span></span>
+        <span class="logo-badge">Pro</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="analyzer.html" class="nav-link">Analyze</a></li>
+        <li><a href="results.html?resume_id=3" class="nav-link">Results</a></li>
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        <li><a href="database.html" class="nav-link active">🗄️ Database</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="theme-btn theme-toggle-btn" title="Toggle Theme">☀️</button>
+        <div id="auth-nav-container" class="nav-actions">
+          <a href="analyzer.html" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.85rem;">+ New Analysis</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main style="padding: 36px 0 80px;">
+    <div class="container">
+      <!-- Database Status Header -->
+      <div class="db-header-card">
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+            <span class="pulse-dot"></span>
+            <span style="font-weight: 700; font-size: 1.15rem;">Live Render Database Explorer</span>
+            <span id="db-engine-badge" class="badge badge-success">Checking...</span>
+          </div>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
+            Direct inspection of registered user accounts, uploaded resume files, and AI evaluation records stored on Render.
+          </p>
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">
+            Synced at: <span id="sync-timestamp">--</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button id="refresh-db-btn" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.85rem;">
+            🔄 Refresh Live Data
+          </button>
+          <a id="export-json-btn" href="/api/admin/export" target="_blank" class="btn btn-outline" style="padding: 8px 16px; font-size: 0.85rem;">
+            📥 Export JSON
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Stats KPI Cards -->
+      <div class="scores-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 28px;">
+        <div class="card" style="padding: 20px; text-align: center;">
+          <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Registered Users</div>
+          <div id="stat-total-users" style="font-size: 2.2rem; font-weight: 800; color: var(--primary); margin: 6px 0;">--</div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary);">Accounts in DB</div>
+        </div>
+        <div class="card" style="padding: 20px; text-align: center;">
+          <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Uploaded Resumes</div>
+          <div id="stat-total-resumes" style="font-size: 2.2rem; font-weight: 800; color: var(--success); margin: 6px 0;">--</div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary);">PDF/DOCX/Text files</div>
+        </div>
+        <div class="card" style="padding: 20px; text-align: center;">
+          <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Completed Analyses</div>
+          <div id="stat-total-analyses" style="font-size: 2.2rem; font-weight: 800; color: var(--info); margin: 6px 0;">--</div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary);">ATS & Quality reports</div>
+        </div>
+        <div class="card" style="padding: 20px; text-align: center;">
+          <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Connected Engine</div>
+          <div id="stat-db-engine" style="font-size: 1.3rem; font-weight: 700; color: var(--warning); margin: 10px 0;">--</div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary);">Storage backend</div>
+        </div>
+      </div>
+
+      <!-- Controls: Tabs & Search -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+        <div class="db-tabs" style="margin-bottom: 0; border-bottom: none;">
+          <button id="tab-users-btn" class="db-tab-btn active" onclick="switchDbTab('users')">
+            👥 Registered Users <span id="badge-users-count" class="badge badge-primary">0</span>
+          </button>
+          <button id="tab-resumes-btn" class="db-tab-btn" onclick="switchDbTab('resumes')">
+            📄 Uploaded Resumes <span id="badge-resumes-count" class="badge badge-primary">0</span>
+          </button>
+          <button id="tab-analyses-btn" class="db-tab-btn" onclick="switchDbTab('analyses')">
+            📊 ATS & Analyses <span id="badge-analyses-count" class="badge badge-primary">0</span>
+          </button>
+          <button id="tab-json-btn" class="db-tab-btn" onclick="switchDbTab('json')">
+            🛠️ Raw DB JSON
+          </button>
+        </div>
+
+        <div>
+          <input type="text" id="db-search-input" class="search-input-db" placeholder="🔍 Search by name, email, or filename..." oninput="handleDbFilter()">
+        </div>
+      </div>
+
+      <!-- Content Views -->
+
+      <!-- TAB 1: USERS TABLE -->
+      <div id="view-users" class="db-table-container">
+        <div style="overflow-x: auto;">
+          <table class="db-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Resumes Uploaded</th>
+                <th>Registration Date</th>
+                <th>Account Status</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                  Loading users from database...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 2: RESUMES TABLE -->
+      <div id="view-resumes" class="db-table-container" style="display: none;">
+        <div style="overflow-x: auto;">
+          <table class="db-table">
+            <thead>
+              <tr>
+                <th>Resume ID</th>
+                <th>Filename</th>
+                <th>Uploader / User</th>
+                <th>File Size</th>
+                <th>Overall Score</th>
+                <th>ATS Score</th>
+                <th>Uploaded At</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="resumes-table-body">
+              <tr>
+                <td colspan="8" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                  Loading resumes from database...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 3: ANALYSES TABLE -->
+      <div id="view-analyses" class="db-table-container" style="display: none;">
+        <div style="overflow-x: auto;">
+          <table class="db-table">
+            <thead>
+              <tr>
+                <th>Analysis ID</th>
+                <th>Resume ID & Name</th>
+                <th>User / Uploader</th>
+                <th>Overall Score</th>
+                <th>ATS Score</th>
+                <th>Quality</th>
+                <th>Readability</th>
+                <th>Skills Match</th>
+                <th>Evaluated Date</th>
+              </tr>
+            </thead>
+            <tbody id="analyses-table-body">
+              <tr>
+                <td colspan="9" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                  Loading analyses from database...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 4: RAW JSON -->
+      <div id="view-json" class="card" style="display: none; padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <span style="font-weight: 600; color: var(--text-secondary);">Direct JSON Database Snapshot</span>
+          <button class="btn btn-outline" style="padding: 4px 12px; font-size: 0.8rem;" onclick="copyDbJson()">📋 Copy JSON</button>
+        </div>
+        <pre id="raw-json-content" class="raw-code-box">Loading raw data...</pre>
+      </div>
+
+      <!-- Footer Info Note -->
+      <div style="margin-top: 28px; padding: 18px 24px; border-radius: var(--radius-md); background: rgba(79, 70, 229, 0.08); border: 1px solid rgba(79, 70, 229, 0.2); font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+        💡 <strong>How Data Storage Works on Render:</strong> When deployed on Render Cloud, the application writes directly to internal storage (<code>resume_ai.db</code>). This live dashboard queries that database in real time. Whenever you register a new user or upload a resume on <a href="https://resume-ai-qxw1.onrender.com" target="_blank" style="color: var(--primary); text-decoration: underline;">https://resume-ai-qxw1.onrender.com</a>, it instantly appears in the tables above!
+      </div>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/database.js"></script>
+</body>
+</html>
