@@ -126,38 +126,7 @@ student_analysis/
 
 ### High-Level Architecture Diagram
 
-```
-+-------------------------------------------------------------------------------+
-|                                CLIENT LAYER                                   |
-|   HTML5 / CSS3 Glassmorphism UI (Desktop, Tablet, Mobile Responsive)          |
-|   Vanilla JS Modules (api.js, upload.js, results.js, charts.js)               |
-+---------------------------------------+---------------------------------------+
-                                        |  REST HTTPS (JSON / FormData)
-                                        v
-+-------------------------------------------------------------------------------+
-|                            FASTAPI BACKEND GATEWAY                            |
-|   Uvicorn ASGI Server | CORS Middleware | Static Files Mount                  |
-|   OAuth2 Bearer JWT Authentication | Magic-Byte File Validation               |
-+-------------------+-----------------------------------+-----------------------+
-                    |                                   |
-                    v                                   v
-+--------------------------------------+   +------------------------------------+
-|         NLP PARSING PIPELINE         |   |         AI & SCORING LAYER         |
-|  1. pdfplumber / python-docx Text    |   |  1. SentenceTransformer Vectors    |
-|  2. Regex Section Classifier         |   |  2. Cosine Similarity Matching     |
-|  3. Contact Regex (Email/Phone/URLs) |   |  3. Multi-Pillar ATS Scorer        |
-|  4. Canonical Taxonomy Extractor     |   |  4. Google Gemini 2.5 Flash        |
-+-------------------+------------------+   +-----------------+------------------+
-                    |                                        |
-                    +-------------------+--------------------+
-                                        |
-                                        v
-+-------------------------------------------------------------------------------+
-|                               PERSISTENCE LAYER                               |
-|   SQLAlchemy 2.0 ORM Engine                                                   |
-|   Dual Mode: Primary MySQL 8.0 <---> Resilient Auto-Fallback SQLite           |
-+-------------------------------------------------------------------------------+
-```
+![ResumeAI System Architecture](frontend/assets/system_architecture.png)
 
 ---
 
