@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy and install dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
 COPY . .
@@ -18,11 +18,11 @@ COPY . .
 # Create uploads directory
 RUN mkdir -p uploads && chmod 777 uploads
 
-# Expose port (default 7860 for Hugging Face Spaces, 8000 for standard)
+# Default to port 10000 (Render default)
 ENV HOST=0.0.0.0
-ENV PORT=7860
+ENV PORT=10000
 ENV ENVIRONMENT=production
-EXPOSE 7860 8000
+EXPOSE 10000
 
 # Start FastAPI server
-CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-7860}"]
+CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port "]
